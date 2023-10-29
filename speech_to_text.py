@@ -9,6 +9,7 @@ from pydub import AudioSegment as AudioSegment_07_dev
 import pydub
 
 recognizer = None
+wav_file_07_dev = "temp.wav"
 
 
 def listen(filepath=None):
@@ -22,7 +23,9 @@ def listen(filepath=None):
             audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
             listen_label.config(text="")
     else:
-        with sr.AudioFile(filepath) as source:
+        audio = AudioSegment_07_dev.from_mp3(filepath)
+        audio.export(wav_file_07_dev, format="wav")
+        with sr.AudioFile(wav_file_07_dev) as source:
             listen_label.config(text="Đang nghe...")
             app.update()
             audio = recognizer.record(source)
@@ -36,7 +39,7 @@ def listen(filepath=None):
         text = recognizer.recognize_google(audio, language=language_code)
         text_box.insert(qt_tk.END, text + "\n")
         tts = gTTS(text=text, lang=language_code)
-        tts.save("output.wav")
+        tts.save("output.mp3")
         recognize_label.config(text="Nhận diện thành công!")
         play_audio()
     except sr.UnknownValueError:
@@ -47,7 +50,7 @@ def listen(filepath=None):
 
 def open_file():
     filepath = filedialog.askopenfilename(title="File to translate",
-                                          filetypes=(("Audio file (*.wav)", "*.wav"),))
+                                          filetypes=(("Audio file (*.mp3)", "*.mp3"),))
     f1 = open(filepath, "r", encoding="utf-8")
     print("filepath", filepath)
     f1.close()
@@ -55,7 +58,7 @@ def open_file():
 
 
 def play_audio():
-    playsound("output.wav")
+    playsound("output.mp3")
 
 
 def close_app():
