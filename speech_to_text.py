@@ -77,7 +77,7 @@ def show_ok_message_lang_combobox(event):
 
 
 app = nvt_tk.Tk()
-app.title("06 QuanTan_D19CQPT01_ PTITHCM: ĐỒ ÁN HP: LẬP TRÌNH MULTI-APP")
+app.title("07 VanTinh_D19CQPT01_PTITHCM: ĐỒ ÁN HP: LẬP TRÌNH MULTI-APP")
 app.geometry('500x400')
 app.resizable(nvt_tk.FALSE, nvt_tk.FALSE)
 
