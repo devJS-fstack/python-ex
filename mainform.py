@@ -1,5 +1,8 @@
 import subprocess
 import tkinter as nvt_tk
+import sys
+
+python_executable = sys.executable
 
 
 def image_processing():
@@ -18,7 +21,7 @@ def speech_to_text():
 
 
 def image_comparison():
-    script_path = "image_comparision.py"
+    script_path = "image_comparision.py"    
     subprocess.run(["python", script_path])
 
 
