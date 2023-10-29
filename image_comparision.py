@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 import cv2 as nvt_cv2
+import numpy as np
 
 
 class ImageComparisonApp:
@@ -17,20 +18,6 @@ class ImageComparisonApp:
         self.button2 = tk.Button(root, text="Browse", command=self.load_image2)
         self.button1.grid(row=0, column=1)
         self.button2.grid(row=1, column=1)
-
-        self.comparison_method_label = tk.Label(
-            root, text="Select Comparison Method:")
-        self.comparison_method_label.grid(row=2, column=0, columnspan=2)
-
-        self.comparison_methods = [
-            "Histogram Comparison"
-        ]
-        self.method_var = tk.StringVar()
-        self.method_var.set(self.comparison_methods[0])
-
-        for i, method in enumerate(self.comparison_methods):
-            tk.Radiobutton(root, text=method, variable=self.method_var, value=method).grid(
-                row=3+i, column=0, columnspan=2)
 
         self.compare_button = tk.Button(
             root, text="Compare", command=self.compare_images)
@@ -63,18 +50,21 @@ class ImageComparisonApp:
             self.result_label.config(text="Please select both images.")
             return
 
-        hist1 = nvt_cv2.calcHist([self.image1], [0], None, [256], [0, 256])
-        hist2 = nvt_cv2.calcHist([self.image2], [0], None, [256], [0, 256])
-        hist_diff = nvt_cv2.compareHist(hist1, hist2, nvt_cv2.HISTCMP_CORREL)
-        color_comparison_result = f"Color Comparison (Histogram): {hist_diff:.2f}"
+        diff_width = self.image1.shape[0] - self.image2.shape[0]
+        diff_height = self.image1.shape[1] - self.image2.shape[1]
+        size_comparison_result = f"Size Comparison: {abs(diff_width)} x {abs(diff_height)}"
 
-        size1 = self.image1.shape[0] * self.image1.shape[1]  # Rows x Columns
-        size2 = self.image2.shape[0] * self.image2.shape[1]
-        size_diff = abs(size1 - size2)
-        size_comparison_result = f"Size Comparison: {size_diff} pixels"
+        is_same = False
+        if diff_width == 0 and diff_height == 0:
+            difference = nvt_cv2.subtract(self.image1, self.image2)
+            b, g, r = nvt_cv2.split(difference)
+            if nvt_cv2.countNonZero(b) == 0 and nvt_cv2.countNonZero(g) == 0 and nvt_cv2.countNonZero(r) == 0:
+                is_same = True
+            else:
+                nvt_cv2.imshow('Difference', difference)
 
         self.result_label.config(
-            text=f"{color_comparison_result}\n{size_comparison_result}")
+            text=f"Color Comparsion: {is_same}\n{size_comparison_result}")
 
     def show_image(self, image, label):
         if image is not None:
