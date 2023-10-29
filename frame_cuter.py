@@ -33,7 +33,7 @@ def listen():
             position = w2n.word_to_num(text)
             filename = files[position-1]
             entry_video.delete(0, tk.END)
-            entry_video.insert(0, f"{absolute_videos}\{filename}")
+            entry_video.insert(0, f"{absolute_videos}/{filename}")
 
         except:
             messagebox.showerror("NotFound", "Option not found")

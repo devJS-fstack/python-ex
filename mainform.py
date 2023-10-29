@@ -7,26 +7,26 @@ python_executable = sys.executable
 
 def image_processing():
     script_path = "image_processing.py"
-    subprocess.run(["python", script_path])
+    subprocess.run([python_executable, script_path])
 
 
 def frame_cutter():
     script_path = "frame_cuter.py"
-    subprocess.run(["python", script_path])
+    subprocess.run([python_executable, script_path])
 
 
 def speech_to_text():
     script_path = "speech_to_text.py"
-    subprocess.run(["python", script_path])
+    subprocess.run([python_executable, script_path])
 
 
 def image_comparison():
     script_path = "image_comparision.py"    
-    subprocess.run(["python", script_path])
+    subprocess.run([python_executable, script_path])
 
 
 root = nvt_tk.Tk()
-root.title("07 VanTinh_D19CQPT01_PTITHCM: ĐỒ ÁN HP: LẬP TRÌNH MULTI-APP")
+root.title("07_VanTinh_D19CQPT01_PTITHCM: ĐỒ ÁN HP: LẬP TRÌNH MULTI-APP")
 root.geometry('500x400')
 root.resizable(nvt_tk.FALSE, nvt_tk.FALSE)
 

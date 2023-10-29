@@ -92,5 +92,6 @@ class ImageComparisonApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.title("07_VanTinh_D19CQPT01_PTITHCM: ĐỒ ÁN HP: LẬP TRÌNH MULTI-APP")
     app = ImageComparisonApp(root)
     root.mainloop()
