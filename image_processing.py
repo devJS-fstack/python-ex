@@ -14,8 +14,14 @@ class ImageProcessorApp:
 
         self.image_label = None
         self.image = None
+        self.is_sliding = False
+
 
         self.create_widgets()
+
+    def stop_slide(self):
+        self.is_sliding = False
+
 
     def create_widgets(self):
 
@@ -38,8 +44,19 @@ class ImageProcessorApp:
         row += 1
 
         slide_button = nvt_ttk.Button(
-            button_frame, text="Slide Image", command=self.apply_sliding_window_on_3_channels)
+            button_frame, text="Strart Slide Image", command=self.apply_sliding_window_on_3_channels)
         slide_button.grid(row=row, column=0, pady=5, sticky="w")
+        slide_button = nvt_ttk.Button(
+            button_frame, text="Stop Slide Image", command=self.stop_slide)
+        slide_button.grid(row=row, column=1, pady=5, sticky="w",  padx=5)
+        row += 1
+
+        self.window_slide_size = nvt_ttk.Label(
+            button_frame, text="Window Slide Size (Width x Height):", font=("Helvetica", 14))
+        self.window_slide_size.grid(row=row, column=0, pady=5, sticky="w")
+
+        self.window_slide_entry = nvt_ttk.Entry(button_frame, font=("Helvetica", 14))
+        self.window_slide_entry.grid(row=row, column=1, pady=5, sticky="w")
         row += 1
 
         show_size_button = nvt_ttk.Button(
@@ -82,6 +99,7 @@ class ImageProcessorApp:
 
         crop_frame = nvt_ttk.Frame(button_frame)
         crop_frame.grid(row=11, column=0, pady=10, sticky="w")
+
 
     def open_image(self):
         file_path = nvt_filedialog.askopenfilename(
@@ -150,53 +168,35 @@ class ImageProcessorApp:
             except ValueError:
                 pass
 
-    def apply_sliding_window(self, img, padding=0, stride=1):
-        h, w = img.shape[:2]
-
-        img_p = np.zeros([h+2*padding, w+2*padding])
-
-        img_p[padding:padding+h, padding:padding+w] = img
-
-        kernel = np.array([[1]])
-
-        assert len(
-            kernel.shape) == 2 and kernel.shape[0] == kernel.shape[1]
-        assert kernel.shape[0] % 2 != 0
-        k_size = kernel.shape[0]
-        k_half = int(k_size/2)
-
-        y_pos = [v for idx, v in enumerate(
-            list(range(k_half, h-k_half))) if idx % stride == 0]
-        x_pos = [v for idx, v in enumerate(
-            list(range(k_half, w-k_half))) if idx % stride == 0]
-
-        new_img = np.zeros([len(y_pos), len(x_pos)])
-        for new_y, y in enumerate(y_pos):
-            for new_x, x in enumerate(x_pos):
-                if k_half == 0:
-                    pixel_val = img_p[y, x] * kernel
-                else:
-                    pixel_val = np.sum(
-                        img_p[y-k_half:y-k_half+k_size, x-k_half:x-k_half+k_size] * kernel)
-                new_img[new_y, new_x] = pixel_val
-
-        return new_img
-
     def apply_sliding_window_on_3_channels(self, padding=0, stride=1):
+        self.is_sliding = True
         if self.image is not None:
-            layer_blue = self.apply_sliding_window(
-                self.image[:, :, 0], padding, stride)
-            layer_green = self.apply_sliding_window(
-                self.image[:, :, 1], padding, stride)
-            layer_red = self.apply_sliding_window(
-                self.image[:, :, 2], padding, stride)
+            try:
+                measure = self.window_slide_entry.get().split("x")
+                w = int(measure[0])
+                h = int(measure[1])
+            except:
+                w = 156
+                h = 156
 
-            new_img = np.zeros(list(layer_blue.shape) + [3])
-            new_img[:, :, 0], new_img[:, :, 1], new_img[:,
-                                                        :, 2] = layer_blue, layer_green, layer_red
+            for (x, y, window) in self.sliding_window(step_size=40, window_size=(w, h)):
+                if not self.is_sliding:
+                    break
+                clone = self.image.copy()
+                nvt_cv2.rectangle(clone, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                self.display_image(clone)
+                self.root.update()
+                self.root.after(100)
 
-            nvt_cv2.imshow("Img", new_img)
-            self.display_image(new_img)
+    def sliding_window(self, step_size, window_size):
+        h, w = window_size
+        image_h, image_w = self.image.shape[:2]
+        for y in range(0, image_h, step_size):
+            for x in range(0, image_w, step_size):
+                window = self.image[y:y + h, x:x + w]
+                if window.shape[:2] != window_size:
+                    continue
+                yield (x, y, window)
 
 
 if __name__ == "__main__":

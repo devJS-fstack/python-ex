@@ -7,7 +7,7 @@ import numpy as np
 class ImageComparisonApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Image Comparison")
+        self.root.title("07_VanTinh_D19CQPT01_PTITHCM: ĐỒ ÁN HP: LẬP TRÌNH MULTI-APP")
 
         self.label1 = tk.Label(root, text="Image 1:")
         self.label2 = tk.Label(root, text="Image 2:")
